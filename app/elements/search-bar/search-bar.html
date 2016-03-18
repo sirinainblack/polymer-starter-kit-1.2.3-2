@@ -1,0 +1,394 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="stylesheet" type="text/css" src="../../typeahead.js/typeahead.css">
+<script type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js'></script>
+
+<script src="../../typeahead.js/typeahead.bundle.min.js"></script>
+<script src="../../typeahead.js/typeahead.jquery.js"></script>
+<dom-module id="search-bar">
+  <template>
+    <style>
+      #search {
+        display: -webkit-box;
+        display: -webkit-flex;
+
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        -moz-align-items: center;
+        -ms-align-items: center;
+        -o-align-items: center;
+        align-items: center;
+        -webkit-box-flex: 1;
+        -webkit-flex: 0 0 auto;
+        -moz-flex: 0 0 auto;
+        -ms-flex: 0 0 auto;
+        -o-flex: 0 0 auto;
+        flex: 0 0 auto;
+        width: 40px;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        background-color: inherit
+      }
+
+      #thisone {
+        width: 100%;
+        top: 0px;
+      }
+
+      .majorpoints {
+        border: none;
+        border-radius: 2px;
+
+      }
+
+      .hiders p {
+        padding: 0px 20px 20px 30px;
+        color: #fff;
+        font-weight: 100;
+        font-size: 1.2em;
+
+      }
+
+      .hiders {
+        margin-top: 50px;
+      }
+
+      #search[show] {
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        padding: 0 16px;
+        margin-left: 0
+      }
+
+      #search[show] input {
+
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        visibility: visible
+      }
+
+      input {
+        width: 100%;
+        background-color: inherit;
+        border: none;
+        font-size: 20px;
+        outline: none;
+        padding: 0;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1 0 0;
+        -moz-flex: 1 0 0;
+        -ms-flex: 1 0 0;
+        -o-flex: 1 0 0;
+        flex: 1 0 0;
+        visibility: hidden;
+        -webkit-appearance: none
+      }
+
+      #itemsList {
+        @apply(--layout-flex);
+      }
+
+      .item {
+        @apply(--layout-horizontal);
+        cursor: pointer;
+        padding: 16px 22px;
+        margin-bottom: 2px
+      }
+
+      .item:focus,
+      .item.selected:focus {
+        outline: 0;
+        background-color: #41b569;
+      }
+
+      .item.selected:focus .dim {
+        color: white
+      }
+
+      .item.selected:focus {
+        color: white
+      }
+
+      .item.selected .star {
+      }
+
+      .item.selected {
+      }
+
+      .avatar {
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        box-sizing: border-box;
+        background-color: #41b569;
+      }
+
+      .pad {
+        @apply(--layout-flex);
+        @apply(--layout-vertical);
+        padding: 0 16px;
+      }
+
+      .primary {
+        font-size: 16px;
+      }
+
+      .secondary {
+        font-size: 14px;
+      }
+
+      .dim {
+        color: black;
+      }
+
+      .star {
+        width: 24px;
+        height: 24px;
+      }
+
+      paper-badge {
+        -webkit-transition: all 0.1s;
+        transition: all 0.1s;
+        opacity: 1;
+        margin-top: 5px;
+      }
+
+      paper-badge[label="0"] {
+        opacity: 0;
+      }
+
+      #starredView {
+        width: 200px;
+      }
+
+      paper-item {
+        white-space: nowrap;
+        cursor: pointer;
+        position: relative;
+      }
+
+      paper-item:hover::after {
+        content: "－";
+        width: 16px;
+        height: 16px;
+        display: block;
+        border-radius: 50% 50%;
+        margin-left: 10px;
+        line-height: 16px;
+        text-align: center;
+        color: white;
+        font-weight: bold;
+        text-decoration: none;
+        position: absolute;
+        right: 15px;
+        top: calc(50% - 8px);
+      }
+
+      .noSelection {
+        color: #999;
+        margin-left: 10px;
+        line-height: 50px;
+      }
+
+      .twoColumns {
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+        overflow: hidden;
+      }
+
+      #starredView {
+        @apply(--layout-vertical);
+      }
+    </style>
+
+
+    <div id="search" show$="{{show}}">
+      <paper-icon-button icon="search"></paper-icon-button>
+      <div id="the-basics">
+        <input id="thisone" is="iron-input" type="text" class=" typeahead" bind-value="{{searchInput}}">
+
+      </div>
+    </div>
+
+    <div class="twoColumns">
+
+      <iron-list id="itemsList" items="{{resList}}" selection-enabled multi-selection>
+        <template>
+          <div>
+            <div tabindex$="{{tabIndex}}" aria-label$="Select/Deselect {{item}}" class$="[[_computedClass(selected)]]">
+
+              <div class="pad">
+                <div class="primary">
+                  {{item}}
+                </div>
+                <div class="secondary dim">{{item}}</div>
+              </div>
+              <iron-icon id="{{tabIndex}}" icon="add-circle-outline" on-tap="add"></iron-icon>
+            </div>
+            <div class="border"></div>
+          </div>
+        </template>
+      </iron-list>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'search-bar',
+
+      properties: {
+        someList: {
+          type: Array,
+          notify: true,
+
+        },
+        resList: {
+          type: Array,
+          notify: true,
+          value: []
+        },
+
+
+        show: {
+          type: Boolean,
+          value: true
+        },
+
+        resultarray: {
+          type: Array
+
+        },
+        searchInput: {
+          type: String,
+          value: ''
+        }
+      },
+      observers: [
+        'usersAddedOrRemoved(someList.splicespoly)'
+      ],
+
+      usersAddedOrRemoved: function (changeRecord) {
+        changeRecord.indexSplices.forEach(function (s) {
+          s.removed.forEach(function (user) {
+            console.log(user + ' was removed');
+          });
+          console.log(s.addedCount + ' users were added');
+        }, this);
+      },
+      showSelection: {
+        type: Boolean,
+        value: true,
+        observer: '_showSelectionChanged'
+
+      },
+      iconForItem: function (isSelected) {
+        return isSelected ? 'star' : 'star-border';
+      },
+      _computedClass: function (isSelected) {
+        var classes = 'item';
+        if (isSelected) {
+          classes += ' selected';
+        }
+        return classes;
+      },
+      _unselect: function (e) {
+        this.$.itemsList.deselectItem(e.model.item);
+      },
+
+      add: function (e) {
+
+        var index = e.target.getAttribute('id')
+
+        if (index > -1) {
+          this.push('someList', this.resList[index]);
+        }
+        console.log(this.someList)
+      },
+
+      created: function () {
+
+        $.ajax({
+          url: "http://localhost:3000/terroirs/search",
+          type: 'GET',
+          data: {'name': ''},
+          success: function (data) {
+
+
+
+            this.resultarray = data;
+            $('#the-basics .typeahead').typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1
+              },
+              {
+                name: 'states',
+                source: this.substringMatcher(this.resultarray)
+              });
+
+
+          }.bind(this),
+          error: function (xhr, status, err) {
+            console.log("didnt connect")
+            console.error(this.props.url, status, err.toString());
+          }.bind(this)
+        });
+
+      },
+      ready: function () {
+
+      },
+      attached: function () {
+
+        var self = this;
+        //  var resultdiv = this.$.el = document.createElement("search-results");
+
+        $('.typeahead').on('typeahead:selected', function (evt, item) {
+          self.splice('resList',0,1);
+          self.push('resList', item);
+        })
+        this.searchInput = '';
+      },
+
+      substringMatcher: function (strs) {
+        return function findMatches(q, cb) {
+          var matches, substringRegex;
+
+          // an array that will be populated with substring matches
+          matches = [];
+
+          // regex used to determine if a string contains the substring `q`
+          substrRegex = new RegExp(q, 'i');
+
+          // iterate through the pool of strings and for any string that
+          // contains the substring `q`, add it to the `matches` array
+          $.each(strs, function (i, str) {
+            if (substrRegex.test(str)) {
+              matches.push(str);
+            }
+          });
+
+          cb(matches);
+
+        };
+      },
+    });
+  </script>
+</dom-module>

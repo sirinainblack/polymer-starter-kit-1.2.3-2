@@ -1,0 +1,110 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/iron-input/iron-input.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<script src="../../bower_components/page/page.js"></script>
+
+<dom-module id="sign-in">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+
+      h2 {
+        color: white;
+        font-family: Helvetica
+      }
+
+      span,
+      input {
+        @apply(--paper-font-body2);
+      }
+    </style>
+    <form>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input is="iron-input" type="user"  bind-value="{{username}}" class="form-control" id="username"  placeholder="Username">
+      </div>
+
+      <button class="btn btn-default" on-click="signin">Sign In</button>
+    </form>
+    <div id="alert" class="alert alert-danger" role="alert" style="display: none">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      Username not recongnized
+    </div>
+    <div id="anchor"></div>
+  </template>
+
+  <script>
+    (function () {
+      'use strict';
+
+
+      Polymer({
+        is: 'sign-in',
+
+        properties: {
+          username: {
+            type: String,
+            value: '',
+            notify: true
+          },
+
+          someProp: {
+            type: String,
+            notify: true
+          },
+
+          someList: {
+            type: Array,
+            notify: true
+          }
+        },
+        signin: function (e) {
+          e.preventDefault()
+          console.log(this.username);
+          $.ajax({
+            url: "http://localhost:3000/users/signin",
+            type: 'POST',
+            data: {username: this.username},
+
+            success: function (data) {
+
+              if (data == 'error') {
+
+                this.querySelector("#alert").style.display = "block"
+              }
+              else {
+
+                console.log("auth reussie !")
+                this.querySelector("#alert").style.display = "none";
+                this.someProp =this.username;
+                this.someList=data;
+this.tList=data;
+                console.log(this.someList);
+                page.redirect('/mes-terroirs')
+
+              }
+            }.bind(
+              this),
+            error: function (xhr, status, err) {
+              console.log("didnt connect")
+              console.error(this.props.url, status, err.toString());
+            }.bind(this)
+          });
+        }
+
+      });
+    })();
+  </script>
+</dom-module>

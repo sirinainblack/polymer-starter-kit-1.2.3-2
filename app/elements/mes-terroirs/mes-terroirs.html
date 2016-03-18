@@ -1,0 +1,211 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<dom-module id="mes-terroirs">
+  <style>
+    #itemsList {
+      @apply(--layout-flex);
+    }
+
+    .item {
+      @apply(--layout-horizontal);
+      cursor: pointer;
+      padding: 16px 22px;
+margin-bottom: 2px    }
+
+    .item:focus,
+    .item.selected:focus {
+      outline: 0;
+      background-color: #41b569;
+    }
+    .item.selected:focus .dim {
+   color: white
+    }
+    .item.selected:focus  {
+      color: white
+    }
+
+    .item.selected .star {
+    }
+
+    .item.selected {
+    }
+
+    .avatar {
+      height: 40px;
+      width: 40px;
+      border-radius: 20px;
+      box-sizing: border-box;
+      background-color: #41b569;
+    }
+
+    .pad {
+      @apply(--layout-flex);
+      @apply(--layout-vertical);
+      padding: 0 16px;
+    }
+
+    .primary {
+      font-size: 16px;
+    }
+
+    .secondary {
+      font-size: 14px;
+    }
+
+    .dim {
+      color: black;
+    }
+
+    .star {
+      width: 24px;
+      height: 24px;
+    }
+
+    paper-badge {
+      -webkit-transition: all 0.1s;
+      transition: all 0.1s;
+      opacity: 1;
+      margin-top: 5px;
+    }
+
+    paper-badge[label="0"] {
+      opacity: 0;
+    }
+
+    #starredView {
+      width: 200px;
+    }
+
+    paper-item {
+      white-space: nowrap;
+      cursor: pointer;
+      position: relative;
+    }
+
+    paper-item:hover::after {
+      content: "－";
+      width: 16px;
+      height: 16px;
+      display: block;
+      border-radius: 50% 50%;
+      margin-left: 10px;
+      line-height: 16px;
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      position: absolute;
+      right: 15px;
+      top: calc(50% - 8px);
+    }
+
+    .noSelection {
+      color: #999;
+      margin-left: 10px;
+      line-height: 50px;
+    }
+
+    .twoColumns {
+      @apply(--layout-flex);
+      @apply(--layout-horizontal);
+      overflow: hidden;
+    }
+
+    #starredView {
+      @apply(--layout-vertical);
+    }
+  </style>
+  <template>
+
+    <div class="twoColumns">
+      <!-- Main List for the items -->
+
+      <iron-list id="itemsList" items={{someList}} selection-enabled multi-selection>
+        <template>
+          <div>
+            <div tabindex$="{{tabIndex}}" aria-label$="Select/Deselect {{item}}" class$="[[_computedClass(selected)]]">
+
+              <div class="pad">
+                <div class="primary">
+                  {{item}}
+                </div>
+                <div class="secondary dim">{{item}}</div>
+              </div>
+              <iron-icon id="{{tabIndex}}" icon="delete" on-tap="remove" ></iron-icon>
+            </div>
+            <div class="border"></div>
+          </div>
+        </template>
+      </iron-list>
+
+
+      <!-- List for the selected items -->
+
+    </div>
+    </div>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: "mes-terroirs",
+    properties: {
+      someList: {
+        type: Array,
+        notify: true,
+       observer : 'usersAddedOrRemoved',
+      }},
+      observers: [
+        'usersAddedOrRemoved(someList.splicespoly)'
+      ],
+    usersAddedOrRemoved: function(changeRecord) {
+      changeRecord.indexSplices.forEach(function(s) {
+        s.removed.forEach(function(user) {
+          console.log(user + ' was removed');
+        });
+        console.log(s.addedCount + ' users were added');
+      }, this);
+    },
+
+    showSelection: {
+      type: Boolean,
+      value: true,
+      observer: '_showSelectionChanged'
+
+    },
+    iconForItem: function (isSelected) {
+      return isSelected ? 'star' : 'star-border';
+    },
+    _computedClass: function (isSelected) {
+      var classes = 'item';
+      if (isSelected) {
+        classes += ' selected';
+      }
+      return classes;
+    },
+    _unselect: function (e) {
+      this.$.itemsList.deselectItem(e.model.item);
+    },
+
+    remove: function(e){
+      var index = e.target.getAttribute('id')
+
+      if (index > -1) {
+        this.splice('someList', index, 1);
+      }
+    }
+  });
+</script>
