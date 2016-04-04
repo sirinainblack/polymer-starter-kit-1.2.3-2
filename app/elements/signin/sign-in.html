@@ -54,22 +54,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         is: 'sign-in',
 
         properties: {
-          username: {
+          someProp: {
             type: String,
             value: '',
             notify: true
           },
-
-          someProp: {
-            type: String,
-            notify: true
-          },
-
           someList: {
             type: Array,
-            notify: true
+            notify: true,
           }
         },
+        ready: function(){
+          var app = Polymer.dom(this.parentNode);
+          console.log(app)
+        },
+
         signin: function (e) {
           e.preventDefault()
           console.log(this.username);
@@ -89,10 +88,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log("auth reussie !")
                 this.querySelector("#alert").style.display = "none";
                 this.someProp =this.username;
-                this.someList=data;
-this.tList=data;
-                console.log(this.someList);
-                page.redirect('/mes-terroirs')
+                this.someList= data
+console.log(this.someList)
+page.redirect('/mes-terroirs');
 
               }
             }.bind(
@@ -102,6 +100,7 @@ this.tList=data;
               console.error(this.props.url, status, err.toString());
             }.bind(this)
           });
+          console.log(this.someList);
         }
 
       });

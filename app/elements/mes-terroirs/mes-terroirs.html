@@ -155,57 +155,62 @@ margin-bottom: 2px    }
 
     </div>
     </div>
-
+<div>
+</div>
   </template>
 </dom-module>
 
 <script>
-  Polymer({
-    is: "mes-terroirs",
-    properties: {
-      someList: {
-        type: Array,
-        notify: true,
-       observer : 'usersAddedOrRemoved',
-      }},
+  (function() {
+    'use strict';
+    Polymer({
+      is: "mes-terroirs",
+      properties: {
+
+        someList: {
+          type: Array,
+          notify: true,
+          observer: 'usersAddedOrRemoved',
+        }
+      },
       observers: [
         'usersAddedOrRemoved(someList.splicespoly)'
       ],
-    usersAddedOrRemoved: function(changeRecord) {
-      changeRecord.indexSplices.forEach(function(s) {
-        s.removed.forEach(function(user) {
-          console.log(user + ' was removed');
-        });
-        console.log(s.addedCount + ' users were added');
-      }, this);
-    },
+      usersAddedOrRemoved: function (changeRecord) {
+        changeRecord.indexSplices.forEach(function (s) {
+          s.removed.forEach(function (user) {
+            console.log(user + ' was removed');
+          });
+          console.log(s.addedCount + ' users were added');
+        }, this);
+      },
 
-    showSelection: {
-      type: Boolean,
-      value: true,
-      observer: '_showSelectionChanged'
+      showSelection: {
+        type: Boolean,
+        value: true,
+        observer: '_showSelectionChanged'
 
-    },
-    iconForItem: function (isSelected) {
-      return isSelected ? 'star' : 'star-border';
-    },
-    _computedClass: function (isSelected) {
-      var classes = 'item';
-      if (isSelected) {
-        classes += ' selected';
+      },
+
+      iconForItem: function (isSelected) {
+        return isSelected ? 'star' : 'star-border';
+      },
+      _computedClass: function (isSelected) {
+        var classes = 'item';
+        if (isSelected) {
+          classes += ' selected';
+        }
+        return classes;
+      },
+
+
+      remove: function (e) {
+        var index = e.target.getAttribute('id')
+
+        if (index > -1) {
+          this.splice('someList', index, 1);
+        }
       }
-      return classes;
-    },
-    _unselect: function (e) {
-      this.$.itemsList.deselectItem(e.model.item);
-    },
-
-    remove: function(e){
-      var index = e.target.getAttribute('id')
-
-      if (index > -1) {
-        this.splice('someList', index, 1);
-      }
-    }
-  });
+    })
+  })();
 </script>

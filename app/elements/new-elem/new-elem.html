@@ -1,6 +1,15 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
@@ -12,11 +21,15 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="stylesheet" type="text/css" href="../../typeahead.js/typeahead.css">
-<script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
 <script src="../../typeahead.js/typeahead.bundle.min.js"></script>
 <script src="../../typeahead.js/typeahead.jquery.js"></script>
-<dom-module id="search-bar">
+<link rel="stylesheet" type="text/css" href="../../typeahead.js/typeahead.css">
+
+<dom-module id="new-elem">
   <template>
     <style>
       #search {
@@ -217,7 +230,6 @@
         @apply(--layout-vertical);
       }
     </style>
-
 {{someList}}
     <div id="search" show$="{{show}}">
       <paper-icon-button icon="search"></paper-icon-button>
@@ -248,143 +260,161 @@
       </iron-list>
     </div>
   </template>
+
   <script>
-    Polymer({
-      is: 'search-bar',
+    (function() {
+      'use strict';
 
-      properties: {
-        someList: {
-          type: Array,
-          notify: true,
-          observer : 'usersAddedOrRemoved',
 
+      Polymer({
+        is: 'new-elem',
+
+        properties: {
+          someList: {
+            type: Array,
+            notify: true,
+            observer : 'usersAddedOrRemoved',
+            reflectToAttribute: true
+
+
+          },
+          resList: {
+            type: Array,
+            notify: true,
+            value: []
+          },
+
+
+          show: {
+            type: Boolean,
+            value: true
+          },
+
+          resultarray: {
+            type: Array
+
+          },
+          searchInput: {
+            type: String,
+            value: ''
+          }
+        },
+        observers: [
+          'usersAddedOrRemoved(list.splicespoly)'
+        ],
+
+        usersAddedOrRemoved: function (changeRecord) {
+          changeRecord.indexSplices.forEach(function (s) {
+            s.removed.forEach(function (user) {
+              console.log(user + ' was removed');
+            });
+            console.log(s.addedCount + ' users were added');
+          }, this);
+        },
+        showSelection: {
+          type: Boolean,
+          value: true,
+          observer: '_showSelectionChanged'
 
         },
-        resList: {
-          type: Array,
-          value: []
+        iconForItem: function (isSelected) {
+          return isSelected ? 'star' : 'star-border';
+        },
+        _computedClass: function (isSelected) {
+          var classes = 'item';
+          if (isSelected) {
+            classes += ' selected';
+          }
+          return classes;
+        },
+        _unselect: function (e) {
+          this.$.itemsList.deselectItem(e.model.item);
         },
 
-        resultarray: {
-          type: Array
-
-        },
-        searchInput: {
-          type: String,
-          value: ''
-        }
-      },
-      observers: [
-        'usersAddedOrRemoved(list.splicespoly)'
-      ],
-
-      usersAddedOrRemoved: function (changeRecord) {
-        changeRecord.indexSplices.forEach(function (s) {
-          s.removed.forEach(function (user) {
-            console.log(user + ' was removed');
-          });
-          console.log(s.addedCount + ' users were added');
-        }, this);
-      },
-      showSelection: {
-        type: Boolean,
-        value: true,
-        observer: '_showSelectionChanged'
-
-      },
-      iconForItem: function (isSelected) {
-        return isSelected ? 'star' : 'star-border';
-      },
-      _computedClass: function (isSelected) {
-        var classes = 'item';
-        if (isSelected) {
-          classes += ' selected';
-        }
-        return classes;
-      },
-      _unselect: function (e) {
-        this.$.itemsList.deselectItem(e.model.item);
-      },
 
 
+        created: function () {
 
-      created: function () {
-
-        $.ajax({
-          url: "http://localhost:3000/terroirs/search",
-          type: 'GET',
-          data: {'name': ''},
-          success: function (data) {
-
-console.log("success")
-
-            this.resultarray = data;
-            console.log("this result array= "+this.resultarray)
-            $('#the-basics .typeahead').typeahead({
-                hint: true,
-                highlight: true,
-                minLength: 1
-              },
-              {
-                name: 'states',
-                source: this.substringMatcher(this.resultarray)
-              });
+          $.ajax({
+            url: "http://localhost:3000/terroirs/search",
+            type: 'GET',
+            data: {'name': ''},
+            success: function (data) {
 
 
-          }.bind(this),
-          error: function (xhr, status, err) {
-            console.log("didnt connect")
-            console.error(this.props.url, status, err.toString());
-          }.bind(this)
-        });
+              this.resultarray = data;
 
-      },
-      ready: function () {
+              $('#the-basics .typeahead').typeahead({
+                  hint: true,
+                  highlight: true,
+                  minLength: 1
+                },
+                {
+                  name: 'states',
+                  source: this.substringMatcher(this.resultarray)
+                });
 
-      },
-      attached: function () {
 
-        var self = this;
-        //  var resultdiv = this.$.el = document.createElement("search-results");
-
-        $('.typeahead').on('typeahead:selected', function (evt, item) {
-          self.splice('resList',0,1);
-          self.push('resList', item);
-        })
-        this.searchInput = '';
-      },
-
-      substringMatcher: function (strs) {
-        return function findMatches(q, cb) {
-          var matches, substringRegex;
-
-          // an array that will be populated with substring matches
-          matches = [];
-
-          // regex used to determine if a string contains the substring `q`
-          substrRegex = new RegExp(q, 'i');
-
-          // iterate through the pool of strings and for any string that
-          // contains the substring `q`, add it to the `matches` array
-          $.each(strs, function (i, str) {
-            if (substrRegex.test(str)) {
-              matches.push(str);
-            }
+            }.bind(this),
+            error: function (xhr, status, err) {
+              console.log("didnt connect")
+              console.error(this.props.url, status, err.toString());
+            }.bind(this)
           });
 
-          cb(matches);
+        },
+        ready: function () {
 
-        };
-      },
-      add: function (e) {
+        },
+        attached: function () {
 
-        var index = e.target.getAttribute('id')
+          var self = this;
+          //  var resultdiv = this.$.el = document.createElement("search-results");
 
-        if (index > -1) {
-          this.push('someList', this.resList[index]);
+          $('.typeahead').on('typeahead:selected', function (evt, item) {
+            self.splice('resList',0,1);
+            self.push('resList', item);
+          })
+          this.searchInput = '';
+        },
+
+
+        add: function (e) {
+
+          var index = e.target.getAttribute('id')
+
+          if (index > -1) {
+            this.push('someList', this.resList[index]);
+          }
+          console.log(this.someList)
+        },
+
+        substringMatcher :  function (strs) {
+          return function findMatches(q, cb) {
+            var matches, substringRegex;
+
+            // an array that will be populated with substring matches
+            matches = [];
+
+            // regex used to determine if a string contains the substring `q`
+            substringRegex = new RegExp(q, 'i');
+
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            $.each(strs, function (i, str) {
+              if (substringRegex.test(str)) {
+                matches.push(str);
+              }
+            });
+
+            cb(matches);
+
+          };
         }
-        console.log(this.someList)
-      }
-    });
+
+
+      });
+
+    })();
   </script>
 </dom-module>

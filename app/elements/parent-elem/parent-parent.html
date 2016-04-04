@@ -1,0 +1,384 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<dom-module id="parent-parent">
+<template >
+  <style is="custom-style" include="../../styles/shared-styles"></style>
+
+  <style>
+
+    paper-scroll-header-panel .animate {
+      -webkit-transition: all ease-in-out 400ms;
+      transition: all ease-in-out 400ms;
+    }
+    paper-scroll-header-panel.left {
+      -webkit-transform: translate3d(-101%, 0, 0);
+      transform: translate3d(-101%, 0, 0);
+      box-shadow: 1px 5px 10px rgba(0,0,0,0.3);
+    }
+
+    paper-scroll-header-panel.right {
+      right: 0;
+      top: 0;
+      -webkit-transform: translate3d(100%, 0, 0);
+      transform: translate3d(100%, 0, 0);
+    }
+    .paper-scroll-header-panel-open .drawer-content .pane, .drawer-open .drawer-content .scroll-content {
+      pointer-events: none;
+    }
+
+
+
+  </style>
+<div>
+
+  </div>
+  <paper-drawer-panel id="paperDrawerPanel">
+    <!-- Drawer Scroll Header Panel -->
+    <paper-scroll-header-panel drawer fixed>
+
+      <!-- Drawer Toolbar -->
+      <paper-toolbar id="drawerToolbar">
+        <span class="menu-name">Menu</span>
+      </paper-toolbar>
+
+      <!-- Drawer Content -->
+      <paper-menu attr-for-selected="data-route" selected="[[route]]"   >
+        <a data-route="home" href="{{baseUrl}}home">
+          <iron-icon icon="home"></iron-icon>
+          <span>Home</span>
+
+        </a>
+
+        <a data-route="search" href="{{baseUrl}}search">
+          <iron-icon icon="home"></iron-icon>
+          <span>Search</span>
+
+        </a>
+
+        <a data-route="addterroir" href="{{baseUrl}}addterroir" id="addTerroir">
+          <iron-icon icon="add-circle-outline"></iron-icon>
+          <span>Add Terroir</span>
+        </a>
+
+
+        <a data-route="contact" href="{{baseUrl}}mes-terroirs">
+          <iron-icon icon="assignment"></iron-icon>
+          <span>Mes Terroirs</span>
+        </a>
+      </paper-menu>
+    </paper-scroll-header-panel>
+
+    <!-- Main Area -->
+    <paper-scroll-header-panel main id="headerPanelMain" condenses keep-condensed-header>
+      <!-- Main Toolbar -->
+      <paper-toolbar id="mainToolbar" class="tall">
+        <paper-icon-button id="paperToggle" icon="menu" paper-drawer-toggle></paper-icon-button>
+
+        <span class="space"></span>
+        <h >{{username}}</h>
+        <!-- Toolbar icons -->
+        <paper-icon-button icon="refresh"></paper-icon-button>
+
+        <a data-route="addterroir" href="{{baseUrl}}addterroir" style="text-decorations:none; color:inherit;">  <paper-icon-button icon="add"></paper-icon-button> </a>
+
+        <!-- Application name -->
+
+        <div class="middle middle-container">
+          <div class="app-name" id="appname">  {{heading}}</div>
+        </div>
+
+        <!-- Application sub title -->
+        <div class="bottom bottom-container">
+          <div class="bottom-title">L'essentiel de votre terroir en 1 clic!
+            </div>
+        </div>
+      </paper-toolbar>
+
+      <!-- Main Content -->
+      <div class="content">
+
+        <iron-pages attr-for-selected="data-route" selected="{{route}}">
+
+          <section data-route="mes-terroirs"  >
+            <paper-material elevation="1">
+
+              <mes-terroirs some-list="{{terrList}}"  >
+
+              </mes-terroirs>
+            </paper-material>
+          </section>
+          <section data-route="search">
+
+            <paper-material elevation="1">
+
+              <new-elem some-list="{{terrList}}"></new-elem>
+
+            </paper-material >
+          </section>
+
+
+          <section data-route="sign-in" >
+
+            <paper-material elevation="1">
+
+              <sign-in  some-prop="{{username}}" some-list="{{terrList}}"  ></sign-in>
+            </paper-material>
+
+          </section>
+
+
+          <section data-route="home">
+
+            <paper-material elevation="1">
+              <div >{{terrList}} </div>
+              <terroir-name  ></terroir-name>
+            </paper-material>
+
+
+            <paper-material elevation="1">
+
+              <terroir-temperature valeur=" {{ test }}" ></terroir-temperature>
+
+            </paper-material>
+
+            <paper-material elevation="1">
+
+              <google-map style="height: 400px" latitude="37.77493" longitude="-122.41942"></google-map>
+            </paper-material>
+
+            <paper-material elevation="1">
+              <terroir-rain></terroir-rain>
+            </paper-material>
+
+            <paper-material elevation="1">
+              <terroir-wind></terroir-wind>
+            </paper-material>
+
+            <paper-material elevation="1">
+              <terroir-water></terroir-water>
+            </paper-material>
+
+          </section>
+
+
+
+          <section data-route="user-info">
+            <paper-material elevation="1">
+              <h2 class="page-title">User: {{params.name}}</h2>
+              <div>This is {{params.name}}'s section</div>
+            </paper-material>
+          </section>
+
+          <section data-route="contact">
+            <paper-material elevation="1">
+              <h2 class="page-title">Contact</h2>
+              <p>This is the contact section</p>
+            </paper-material>
+          </section>
+        </iron-pages>
+      </div>
+    </paper-scroll-header-panel>
+  </paper-drawer-panel>
+
+  <paper-toast id="toast">
+    <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
+  </paper-toast>
+
+
+
+</template>
+
+<script>
+
+
+
+  (function(document) {
+    Polymer({
+      is: "parent-parent",
+      properties: {
+
+        username: {
+          type: String,
+          value: 'USER'
+
+        },
+        terrList: {
+          type: Array,
+
+
+        },
+
+      },
+
+      ready: function () {
+
+        // Grab a reference to our auto-binding template
+        // and give it some initial binding values
+        // Learn more about auto-binding templates at http://goo.gl/Dx1u2g
+        var app = Polymer.dom(this.parentNode).childNodes[1];
+
+
+        this.baseUrl = '/';
+
+
+        if (window.location.port === '') {  // if production
+        }
+        app.heading = 'Mon Terroir!'
+
+        app.addEventListener('iron-select', function (e) {
+          console.log("event iron")
+        });
+        app.addEventListener('username-change', function (e) {
+          console.log("username change")
+        });
+
+        app.displayInstalledToast = function () {
+          // Check to make sure caching is actually enabled—it won't be in the dev environment.
+          if (!Polymer.dom(document).querySelector('platinum-sw-cache').disabled) {
+            Polymer.dom(document).querySelector('#caching-complete').show();
+          }
+        };
+
+
+        // Listen for template bound event to know when bindings
+        // have resolved and content has been stamped to the page
+        app.addEventListener('dom-change', function () {
+
+
+        });
+
+        // See https://github.com/Polymer/polymer/issues/1381
+        window.addEventListener('iron-select', function () {
+          var pages = document.querySelector('iron-pages');
+          if (pages.selected == 'mes-terroirs') {
+            app.heading = 'Mes Terroirs'
+          }
+          ;
+          if (pages.selected == 'home') {
+            app.heading = 'Mon Terroir'
+          }
+          if (pages.selected == 'users') {
+            app.heading = 'Add Terroir'
+          }
+          // imports are loaded and elements have been registered
+        });
+
+        // Main area's paper-scroll-header-panel custom condensing transformation of
+        // the appName in the middle-container and the bottom title in the bottom-container.
+        // The appName is moved to top and shrunk on condensing. The bottom sub title
+        // is shrunk to nothing on condensing.
+        window.addEventListener('paper-header-transform', function (e) {
+          var appName = app.querySelector('#mainToolbar .app-name');
+          console.log(appName);
+          var middleContainer = app.querySelector('#mainToolbar .middle-container');
+          var bottomContainer = app.querySelector('#mainToolbar .bottom-container');
+          var detail = e.detail;
+          var heightDiff = detail.height - detail.condensedHeight;
+          var yRatio = Math.min(1, detail.y / heightDiff);
+          // appName max size when condensed. The smaller the number the smaller the condensed size.
+          var maxMiddleScale = 0.50;
+          var auxHeight = heightDiff - detail.y;
+          var auxScale = heightDiff / (1 - maxMiddleScale);
+          var scaleMiddle = Math.max(maxMiddleScale, auxHeight / auxScale + maxMiddleScale);
+          var scaleBottom = 1 - yRatio;
+
+          // Move/translate middleContainer
+          Polymer.Base.transform('translate3d(0,' + yRatio * 100 + '%,0)', middleContainer);
+
+          // Scale bottomContainer and bottom sub title to nothing and back
+          Polymer.Base.transform('scale(' + scaleBottom + ') translateZ(0)', bottomContainer);
+
+          // Scale middleContainer appName
+          Polymer.Base.transform('scale(' + scaleMiddle + ') translateZ(0)', appName);
+        });
+
+
+        window.addEventListener('WebComponentsReady', function () {
+
+          // We use Page.js for routing. This is a Micro
+          // client-side router inspired by the Express router
+          // More info: https://visionmedia.github.io/page.js/
+
+          // Removes end / from app.baseUrl which page.base requires for production
+          if (window.location.port === '') {  // if production
+            page.base(app.baseUrl.replace(/\/$/, ''));
+          }
+
+
+          page('/home', function () {
+            app.route = 'home';
+          });
+
+          page('/', function () {
+            app.route = 'sign-in';
+          });
+
+          page(app.baseUrl, function () {
+            app.route = 'home';
+          });
+
+          page('/addterroir', function () {
+            app.route = 'addterroir';
+          });
+          page('/search', function () {
+            app.route = 'search';
+          });
+          page('/users/:name', function (data) {
+            app.route = 'user-info';
+            app.params = data.params;
+          });
+
+          page('/contact', function () {
+            app.route = 'contact';
+          });
+          page('/mes-terroirs', function () {
+            app.route = 'mes-terroirs';
+          });
+
+          // 404
+          page('*', function () {
+            app.$.toast.text = 'Can\'t find: ' + window.location.href + '. Redirected you to Home Page';
+            app.$.toast.show();
+            page.redirect(app.baseUrl);
+          });
+
+          // add #! before urls
+          page({
+            hashbang: true
+          });
+
+        });
+
+        this.addEventListener('terr-list-changed', function(e){
+          console.log(e.detail.value);
+
+          console.log("say something i'm giving up on you")
+        })
+      }
+      ,
+      attached: function(){
+
+    }
+
+
+    })
+
+
+
+  })(document);
+
+
+</script>
+</dom-module>
